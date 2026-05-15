@@ -3,11 +3,10 @@ from sqlalchemy.orm import DeclarativeBase
 
 from app.core.config import settings
 
-# Async engine — uses asyncpg driver
 engine = create_async_engine(
     settings.DATABASE_URL,
-    echo=settings.DEBUG,   # logs SQL in dev
-    pool_pre_ping=True,    # auto-reconnect on stale connections
+    echo=settings.DEBUG,
+    pool_pre_ping=True,
 )
 
 AsyncSessionLocal = async_sessionmaker(
@@ -21,7 +20,6 @@ class Base(DeclarativeBase):
     pass
 
 
-# FastAPI dependency — yields a session per request
 async def get_db():
     async with AsyncSessionLocal() as session:
         try:
