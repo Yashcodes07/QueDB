@@ -1,9 +1,13 @@
 import axios from 'axios'
 import { useAuthStore } from '../store/authStore'
 
-// ✅ reads from .env.production on Vercel, falls back to localhost for dev
+// ✅ automatically appends /api to base URL
+const BASE_URL = import.meta.env.VITE_API_URL 
+  ? `${import.meta.env.VITE_API_URL}/api`
+  : 'http://localhost:8000/api'
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000',
+  baseURL: BASE_URL,
 })
 
 // Attach JWT token to every request automatically
