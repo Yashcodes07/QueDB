@@ -44,3 +44,7 @@ async def root():
 @app.get("/api/auth/me", response_model=UserOut, tags=["Auth"])
 async def me(current_user=Depends(get_current_user)):
     return current_user
+
+@app.get("/health", tags=["Health"])
+async def health():
+    return {"status": "ok"}
