@@ -3,16 +3,14 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sess
 from sqlalchemy.orm import DeclarativeBase
 from app.core.config import settings
 
-
 def get_engine():
     db_url = settings.DATABASE_URL
-
-    # Clean URL - remove any ssl params
-    for param in ["?ssl=true", "?sslmode=require", "&sslmode=require", "?ssl=require"]:
+    # Remove ssl params — handled in connect_args
+    for param in ["?sslmode=require", "?ssl=require", "?ssl=true", "&sslmode=require"]:
         db_url = db_url.replace(param, "")
 
-    # Supabase needs SSL
-    if "supabase.co" in db_url:
+    # SSL for both Neon and Supabase
+    if any(x in db_url for x in ["neon.tech", "supabase.com", "supabase.co"]):
         ssl_context = ssl.create_default_context()
         ssl_context.check_hostname = False
         ssl_context.verify_mode = ssl.CERT_NONE
@@ -29,7 +27,6 @@ def get_engine():
         connect_args=connect_args,
     )
 
-
 engine = get_engine()
 
 AsyncSessionLocal = async_sessionmaker(
@@ -38,10 +35,8 @@ AsyncSessionLocal = async_sessionmaker(
     expire_on_commit=False,
 )
 
-
 class Base(DeclarativeBase):
     pass
-
 
 async def get_db():
     async with AsyncSessionLocal() as session:
