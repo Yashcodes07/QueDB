@@ -3,14 +3,15 @@ from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine, async_sess
 from sqlalchemy.orm import DeclarativeBase
 from app.core.config import settings
 
-# Build SSL context for Supabase
+
 def get_engine():
     db_url = settings.DATABASE_URL
 
-    # Remove any ssl params from URL — we handle SSL separately
-    db_url = db_url.replace("?ssl=true", "").replace("?sslmode=require", "").replace("&sslmode=require", "")
+    # Clean URL - remove any ssl params
+    for param in ["?ssl=true", "?sslmode=require", "&sslmode=require", "?ssl=require"]:
+        db_url = db_url.replace(param, "")
 
-    # Check if connecting to Supabase (needs SSL)
+    # Supabase needs SSL
     if "supabase.co" in db_url:
         ssl_context = ssl.create_default_context()
         ssl_context.check_hostname = False
@@ -23,8 +24,11 @@ def get_engine():
         db_url,
         echo=settings.DEBUG,
         pool_pre_ping=True,
+        pool_size=5,
+        max_overflow=10,
         connect_args=connect_args,
     )
+
 
 engine = get_engine()
 
