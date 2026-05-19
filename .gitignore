@@ -6,6 +6,7 @@ __pycache__/
 
 # Frontend dependencies
 node_modules/
+frontend/.env.production
 
 # Build folders
 dist/
